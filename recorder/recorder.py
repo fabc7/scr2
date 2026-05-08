@@ -117,8 +117,8 @@ async def record_stream(profile_url):
                 
                 seconds_without_data = 0
                 previous_size = 0
-                # MAX_BYTES = 15 * 1024 * 1024 * 1024 # 15 GB
-                MAX_BYTES = 20 * 1024 * 1024 # Test 20 mb
+                MAX_BYTES = 30 * 1024 * 1024 * 1024 # 30 GB
+                # MAX_BYTES = 20 * 1024 * 1024 # Test 20 mb
                 
                 while True:
                     await asyncio.sleep(5)
@@ -136,7 +136,7 @@ async def record_stream(profile_url):
                         seconds_without_data += 5
                         
                     downloaded_mb = current_size / (1024 * 1024)
-                    print(f"Status: Recording... Current size: {downloaded_mb:.2f} MB 15000 MB", end="\r")
+                    print(f"Status: Recording... Current size: {downloaded_mb:.2f} MB 30000 MB", end="\r")
 
                     if current_size >= MAX_BYTES:
                         print(f"\n\n[INFO] Target size size 15000 MB reached ({downloaded_mb:.2f} MB). Stopping recording.")
