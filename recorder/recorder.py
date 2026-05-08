@@ -21,7 +21,7 @@ async def record_stream(profile_url):
             browser = await p.chromium.launch(headless=True)
             context = await browser.new_context(
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-                viewport={"width": 1920, "height": 1080}
+                viewport={"width": 1280, "height": 720}
             )
             page = await context.new_page()
 
@@ -198,12 +198,26 @@ async def record_stream(profile_url):
         largest_file = max(valid_files, key=os.path.getsize)
 
         print(f"[INFO] Using stream file: {largest_file}")
-        
+
+        """
         ffmpeg_cmd = [
             'ffmpeg',
             '-y',
             '-i', largest_file,
             '-c', 'copy',
+            final_output_path
+        ]
+        """
+        
+        ffmpeg_cmd = [
+            'ffmpeg',
+            '-y',
+            '-i', largest_file,
+            '-vf', 'scale=2560:1440:flags=lanczos',
+            '-c:v', 'libx264',
+            '-preset', 'veryfast',
+            '-crf', '22',
+            '-c:a', 'copy',
             final_output_path
         ]
         
