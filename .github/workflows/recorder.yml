@@ -27,6 +27,11 @@ jobs:
           large-packages: true
           docker-images: true
           swap-storage: true
+
+      - name: Check Disk Space
+        run: |
+          echo "Disk space:"
+          df -h /
           
       - name: Setup Python
         uses: actions/setup-python@v5
