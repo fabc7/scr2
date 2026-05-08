@@ -216,7 +216,7 @@ async def record_stream(profile_url):
             '-vf', 'scale=2560:1440:flags=lanczos',
             '-c:v', 'libx264',
             '-preset', 'veryfast',
-            '-crf', '22',
+            '-crf', '18',
             '-c:a', 'copy',
             final_output_path
         ]
