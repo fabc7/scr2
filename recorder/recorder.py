@@ -21,7 +21,7 @@ async def record_stream(profile_url):
             browser = await p.chromium.launch(headless=True)
             context = await browser.new_context(
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-                viewport={"width": 1280, "height": 720}
+                viewport={"width": 1920, "height": 1080}
             )
             page = await context.new_page()
 
@@ -40,7 +40,9 @@ async def record_stream(profile_url):
                             "type": ext,
                             "flush_counter": 0
                         }
-                        print(f"[INFO] New stream detected: {ext} (Mime: {mime_type[:30]}...)")
+                        print(f"[STREAM INFO]")
+                        print(f"  MIME: {mime_type}")
+                        print(f"  EXT: {ext}")
                     except Exception as e:
                         print(f"[ERROR] Failed to create temp file {tmp_name}: {e}")
                         return
@@ -115,8 +117,8 @@ async def record_stream(profile_url):
                 
                 seconds_without_data = 0
                 previous_size = 0
-                MAX_BYTES = 15 * 1024 * 1024 * 1024 # 15 GB
-                # MAX_BYTES = 20 * 1024 * 1024 # Test 20 mb
+                # MAX_BYTES = 15 * 1024 * 1024 * 1024 # 15 GB
+                MAX_BYTES = 20 * 1024 * 1024 # Test 20 mb
                 
                 while True:
                     await asyncio.sleep(5)
