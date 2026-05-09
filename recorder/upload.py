@@ -4,12 +4,15 @@ from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from googleapiclient.http import MediaFileUpload
 
-CLIENT_ID = os.environ.get('YOUTUBE_CLIENT_ID')
-CLIENT_SECRET = os.environ.get('YOUTUBE_CLIENT_SECRET')
-REFRESH_TOKEN = os.environ.get('YOUTUBE_REFRESH_TOKEN')
+CLIENT_ID = os.environ.get('CLIENT_ID')
+CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
+REFRESH_TOKEN = os.environ.get('REFRESH_TOKEN')
+
+FOLDER_ID = os.environ.get('FOLDER_ID')
 STREAM_URL = os.environ.get('STREAM_URL', 'Unknown Stream')
 
-def get_authenticated_service():
+
+def get_drive_service():
     creds = Credentials(
         token=None,
         refresh_token=REFRESH_TOKEN,
@@ -17,7 +20,8 @@ def get_authenticated_service():
         client_secret=CLIENT_SECRET,
         token_uri="https://oauth2.googleapis.com/token"
     )
-    return build('youtube', 'v3', credentials=creds)
+    return build('drive', 'v3', credentials=creds)
+
 
 def upload_latest_video():
     files = glob.glob('**/*.mkv', recursive=True)
@@ -31,37 +35,37 @@ def upload_latest_video():
 
     base_name = os.path.basename(video_file)
     name_without_ext = os.path.splitext(base_name)[0]
-    auto_title = name_without_ext.replace('_', ' ')
-    
+    file_title = name_without_ext.replace('_', ' ')
+
     try:
-        youtube = get_authenticated_service()
-        body = {
-            'snippet': {
-                'title': auto_title, # Aquí inyectamos el título autogenerado
-                'description': f'Auto re-upload from {STREAM_URL}',
-                'tags': ['stream', 'vod'],
-                'categoryId': '20' 
-            },
-            'status': {
-                'privacyStatus': 'private',
-                'selfDeclaredMadeForKids': False
-            }
+        drive = get_drive_service()
+
+        file_metadata = {
+            'name': file_title,
+            'parents': [FOLDER_ID]
         }
-        
-        print(f"[INFO] Uploading video to YouTube as '{auto_title}'...")
-        media = MediaFileUpload(video_file, chunksize=1024*1024*5, resumable=True) 
-        request = youtube.videos().insert(part=','.join(body.keys()), body=body, media_body=media)
-        
+
+        print(f"[INFO] Uploading to Google Drive as '{file_title}'...")
+
+        media = MediaFileUpload(video_file, resumable=True)
+
+        request = drive.files().create(
+            body=file_metadata,
+            media_body=media,
+            fields='id'
+        )
+
         response = None
         while response is None:
             status, response = request.next_chunk()
             if status:
                 print(f"Upload Progress: {int(status.progress() * 100)}%")
-                
-        print(f"\n[SUCCESS] Upload complete! Video ID: {response.get('id')}")
-        
+
+        print(f"\n[SUCCESS] Upload complete! File ID: {response.get('id')}")
+
     except Exception as e:
-        print(f"[ERROR] YouTube Upload failed: {e}")
+        print(f"[ERROR] Drive Upload failed: {e}")
+
 
 if __name__ == '__main__':
     upload_latest_video()
