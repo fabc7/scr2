@@ -214,7 +214,6 @@ async def record_stream(profile_url):
         except Exception as e:
             print(f"[WARN] Error getting resolution: {e}")
 
-        """
         ffmpeg_cmd = [
             'ffmpeg',
             '-y',
@@ -222,22 +221,7 @@ async def record_stream(profile_url):
             '-c', 'copy',
             final_output_path
         ]
-        """
-        
-        ffmpeg_cmd = [
-            'ffmpeg',
-            '-y',
-            '-i', largest_file,
-            '-vf', 'scale=1920:1080:flags=lanczos',
-            '-c:v', 'libx264',
-            '-preset', 'slow',
-            '-crf', '16',
-            '-profile:v', 'high',
-            '-pix_fmt', 'yuv420p',
-            '-movflags', '+faststart',
-            '-c:a', 'copy',
-            final_output_path
-        ]
+
         try:
             result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True)
             
