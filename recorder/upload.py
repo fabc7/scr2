@@ -23,6 +23,40 @@ def get_drive_service():
     return build('drive', 'v3', credentials=creds)
 
 
+def clear_drive_folder_permanently(drive, folder_id):
+    print("[INFO] Permanently deleting all files in folder...")
+
+    query = f"'{folder_id}' in parents and trashed=false"
+
+    page_token = None
+
+    while True:
+        results = drive.files().list(
+            q=query,
+            fields="nextPageToken, files(id, name)",
+            pageToken=page_token
+        ).execute()
+
+        files = results.get('files', [])
+
+        if not files:
+            print("[INFO] No files found.")
+            return
+
+        for f in files:
+            try:
+                print(f"[DELETE] {f['name']} ({f['id']})")
+                drive.files().delete(fileId=f['id']).execute()
+            except Exception as e:
+                print(f"[ERROR] Could not delete {f['name']}: {e}")
+
+        page_token = results.get('nextPageToken')
+        if not page_token:
+            break
+
+    print("[INFO] Folder fully cleared.")
+
+
 def upload_latest_video():
     files = glob.glob('**/*.mkv', recursive=True)
     if not files:
@@ -39,6 +73,8 @@ def upload_latest_video():
 
     try:
         drive = get_drive_service()
+
+        clear_drive_folder_permanently(drive, FOLDER_ID)
 
         file_metadata = {
             'name': file_title,
