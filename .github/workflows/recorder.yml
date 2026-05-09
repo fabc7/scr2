@@ -54,7 +54,7 @@ jobs:
           STREAM_URL: ${{ github.event.inputs.stream_url }}
         run: python recorder/recorder.py
 
-      - name: Upload Video to YouTube
+      - name: Backup video
         if: success() 
         env:
           STREAM_URL: ${{ github.event.inputs.stream_url }}
