@@ -33,7 +33,6 @@ async def record_stream(profile_url):
                     tmp_name = os.path.join(SCRIPT_DIR, f"tmp_{buffer_id}.{ext}")
                     
                     try:
-                        # raw_files[buffer_id] = {"file": open(tmp_name, "wb"), "name": tmp_name, "type": ext}
                         raw_files[buffer_id] = {
                             "file": open(tmp_name, "wb"),
                             "name": tmp_name,
@@ -48,8 +47,6 @@ async def record_stream(profile_url):
                         return
                 
                 try:
-                    # data = base64.b64decode(b64_data)
-                    # raw_files[buffer_id]["file"].write(data)
                     data = base64.b64decode(b64_data)
                     f = raw_files[buffer_id]["file"]
                     f.write(data)
@@ -118,7 +115,7 @@ async def record_stream(profile_url):
                 seconds_without_data = 0
                 previous_size = 0
                 # MAX_BYTES = 30 * 1024 * 1024 * 1024 # 30 GB
-                MAX_BYTES = 50 * 1024 * 1024 # Test 20 mb
+                MAX_BYTES = 20 * 1024 * 1024 # Test 20 mb
                 
                 while True:
                     await asyncio.sleep(5)
@@ -198,6 +195,24 @@ async def record_stream(profile_url):
         largest_file = max(valid_files, key=os.path.getsize)
 
         print(f"[INFO] Using stream file: {largest_file}")
+
+        try:
+            probe_cmd = [
+                'ffprobe',
+                '-v', 'error',
+                '-select_streams', 'v:0',
+                '-show_entries', 'stream=width,height',
+                '-of', 'csv=p=0',
+                largest_file
+            ]
+            result = subprocess.run(probe_cmd, capture_output=True, text=True)
+            if result.returncode == 0:
+                resolution = result.stdout.strip()
+                print(f"[INFO] Stream video resolution: {resolution}")
+            else:
+                print("[WARN] Could not determine stream video resolution")
+        except Exception as e:
+            print(f"[WARN] Error getting resolution: {e}")
 
         """
         ffmpeg_cmd = [
