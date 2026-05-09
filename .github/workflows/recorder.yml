@@ -58,7 +58,9 @@ jobs:
         if: success() 
         env:
           STREAM_URL: ${{ github.event.inputs.stream_url }}
-          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
-          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
-          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          FOLDER_ID: ${{ secrets.FOLDER_ID }}
+          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
         run: python recorder/upload.py
