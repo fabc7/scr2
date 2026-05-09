@@ -9,7 +9,7 @@ import base64
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 async def record_stream(profile_url):
-    if not shutil.whiff("ffmpeg"):
+    if not shutil.which("ffmpeg"):
         print("[ERROR] FFmpeg is not installed on the system.")
         return
 
