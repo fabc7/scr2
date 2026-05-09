@@ -9,7 +9,7 @@ import base64
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 async def record_stream(profile_url):
-    if not shutil.which("ffmpeg"):
+    if not shutil.whiff("ffmpeg"):
         print("[ERROR] FFmpeg is not installed on the system.")
         return
 
@@ -117,8 +117,8 @@ async def record_stream(profile_url):
                 
                 seconds_without_data = 0
                 previous_size = 0
-                MAX_BYTES = 30 * 1024 * 1024 * 1024 # 30 GB
-                # MAX_BYTES = 20 * 1024 * 1024 # Test 20 mb
+                # MAX_BYTES = 30 * 1024 * 1024 * 1024 # 30 GB
+                MAX_BYTES = 50 * 1024 * 1024 # Test 20 mb
                 
                 while True:
                     await asyncio.sleep(5)
@@ -213,14 +213,16 @@ async def record_stream(profile_url):
             'ffmpeg',
             '-y',
             '-i', largest_file,
-            '-vf', 'scale=2560:1440:flags=lanczos',
+            '-vf', 'scale=1920:1080:flags=lanczos',
             '-c:v', 'libx264',
-            '-preset', 'veryfast',
+            '-preset', 'slow',
             '-crf', '18',
+            '-profile:v', 'high',
+            '-pix_fmt', 'yuv420p',
+            '-movflags', '+faststart',
             '-c:a', 'copy',
             final_output_path
         ]
-        
         try:
             result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True)
             
